@@ -37,6 +37,6 @@ jobs:
       - run: flutter pub global run peanut -b production
       - name: Push to production branch
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "2243162077@qq.com"
+          git config --local user.name "HBWuChang"
           git push origin production:production
