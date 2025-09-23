@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../controller/controllers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 
 class ApeiriePage extends StatelessWidget {
@@ -76,21 +75,7 @@ class ApeiriePage extends StatelessWidget {
     final track = controller.currentTrack.value;
 
     return GestureDetector(
-      onTap: () {
-        // 获取当前URI并修改scheme为listen1-xuan
-        final currentUri = Uri.parse(Get.currentRoute);
-        final newUri = Uri(
-          scheme: 'listen1-xuan',
-          host: currentUri.host.isNotEmpty
-              ? currentUri.host
-              : 'listen1-xuan.040905.xyz',
-          path: currentUri.path,
-          query: currentUri.query.isNotEmpty ? currentUri.query : null,
-        );
-
-        debugPrint('Opening URI with listen1-xuan scheme: $newUri');
-        launchUrl(newUri);
-      },
+      onTap: controller.redir,
       child: Tooltip(
         message: '在 listen1_xuan 中打开',
         child: Card(

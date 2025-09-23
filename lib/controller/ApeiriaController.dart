@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/track.dart';
 
@@ -21,18 +22,18 @@ class ApeiriaController extends GetxController {
       // 首先尝试从Get的路由参数中获取
       if (Get.parameters.isNotEmpty) {
         debugPrint('Get parameters: ${Get.parameters}');
-        
+
         // 从路由参数中获取trackId
         final trackIdFromPath = Get.parameters['trackId'];
         if (trackIdFromPath != null) {
           debugPrint('Received trackId from path: $trackIdFromPath');
         }
       }
-      
+
       // 从路由arguments中获取track数据
       if (Get.arguments != null) {
         final arguments = Get.arguments as Map<String, dynamic>;
-        
+
         if (arguments.containsKey('track')) {
           final trackData = arguments['track'];
           if (trackData is String) {
@@ -46,14 +47,14 @@ class ApeiriaController extends GetxController {
           debugPrint('Received trackId from arguments: $trackId');
         }
       }
-      
+
       // 如果路由参数中没有，尝试从URL查询参数中获取（Web环境）
       if (currentTrack.value == null) {
         final uri = Uri.parse(Get.currentRoute);
         final queryParameters = uri.queryParameters;
         debugPrint('Current route: ${Get.currentRoute}');
         debugPrint('Query parameters: $queryParameters');
-        
+
         if (queryParameters.containsKey('track')) {
           String trackBase64 = queryParameters['track']!;
           currentTrack.value = Track.fromBase64(trackBase64);
@@ -63,11 +64,19 @@ class ApeiriaController extends GetxController {
           // TODO: 通过trackId获取完整的Track信息
         }
       }
-      
+
       if (currentTrack.value == null) {
         throw '未找到歌曲信息';
       } else {
         debugPrint('Successfully parsed track: ${currentTrack.value?.title}');
+        // redir();
+        Future.delayed(const Duration(seconds: 1), () {
+          try {
+            redir();
+          } catch (e) {
+            debugPrint('redir error: $e');
+          }
+        });
       }
     } catch (e) {
       debugPrint('解析歌曲信息失败: $e');
@@ -75,6 +84,22 @@ class ApeiriaController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void redir() {
+    // 获取当前URI并修改scheme为listen1-xuan
+    final currentUri = Uri.parse(Get.currentRoute);
+    final newUri = Uri(
+      scheme: 'listen1-xuan',
+      host: currentUri.host.isNotEmpty
+          ? currentUri.host
+          : 'listen1-xuan.040905.xyz',
+      path: currentUri.path,
+      query: currentUri.query.isNotEmpty ? currentUri.query : null,
+    );
+
+    debugPrint('Opening URI with listen1-xuan scheme: $newUri');
+    launchUrl(newUri);
   }
 
   /// 获取音源显示名称
