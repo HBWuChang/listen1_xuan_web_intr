@@ -1,0 +1,42 @@
+name: cf
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - '**/*.dart'
+      - 'pubspec.yaml'
+      - '**/dart.yml'
+
+# 添加权限配置，允许写入仓库内容
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: "contains(github.event.head_commit.message, 'cf')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # 获取完整的git历史，这对于推送到其他分支很重要
+          fetch-depth: 0
+          # 使用GitHub token进行身份验证
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21' 
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.32.0'
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter pub global activate peanut
+      - run: flutter pub global run peanut -b production
+      - name: Push to production branch
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git push origin production:production
