@@ -23,6 +23,10 @@ jobs:
           fetch-depth: 0
           # 使用GitHub token进行身份验证
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure git
+        run: |
+          git config --global user.email "2243162077@qq.com"
+          git config --global user.name "HBWuChang"
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -36,7 +40,7 @@ jobs:
       - run: flutter pub global activate peanut
       - run: flutter pub global run peanut -b production
       - name: Push to production branch
-        run: |
-          git config --local user.email "2243162077@qq.com"
-          git config --local user.name "HBWuChang"
-          git push origin production:production
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: production
