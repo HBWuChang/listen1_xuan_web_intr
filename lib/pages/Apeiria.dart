@@ -81,7 +81,9 @@ class ApeiriePage extends StatelessWidget {
         final currentUri = Uri.parse(Get.currentRoute);
         final newUri = Uri(
           scheme: 'listen1-xuan',
-          host: currentUri.host.isNotEmpty ? currentUri.host : 'app',
+          host: currentUri.host.isNotEmpty
+              ? currentUri.host
+              : 'listen1-xuan.040905.xyz',
           path: currentUri.path,
           query: currentUri.query.isNotEmpty ? currentUri.query : null,
         );
