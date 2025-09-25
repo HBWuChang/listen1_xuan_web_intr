@@ -1,6 +1,23 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'dart:convert';
+import 'dart:io';
+
+String gzipJsonString(String jsonStr) {
+  // 将字符串转为字节
+  List<int> jsonBytes = utf8.encode(jsonStr);
+  // gzip 压缩
+  List<int> compressedBytes = gzip.encode(jsonBytes);
+  // base64Url 编码为字符串（URL 安全）
+  return base64Url.encode(compressedBytes);
+}
+
+String ungzipJsonString(String base64CompressedStr) {
+  // base64Url 解码
+  List<int> compressedBytes = base64Url.decode(base64CompressedStr);
+  // gzip 解压
+  List<int> decompressedBytes = gzip.decode(compressedBytes);
+  // 转为字符串
+  return utf8.decode(decompressedBytes);
+}
 
 class Track {
   String id;
@@ -50,16 +67,23 @@ class Track {
       lyric_url: lyric_url,
     );
   }
-  factory Track.fromBase64(String base64Str) {
-    String jsonString = utf8.decode(base64Url.decode(base64Str));
+  factory Track.fromBase64MaybeGzip(String base64Str) {
+    String jsonString;
+    try {
+      // 尝试作为 gzip 压缩数据解压
+      jsonString = ungzipJsonString(base64Str);
+    } catch (e) {
+      // 如果解压失败，尝试作为普通 base64 解码
+      jsonString = utf8.decode(base64Url.decode(base64Str));
+    }
     Map<String, dynamic> jsonMap = jsonDecode(jsonString);
     return Track.fromJson(jsonMap);
   }
-  String toBase64() {
+  String toBase64WithGzip() {
     String jsonString = jsonEncode(toJson());
-    return base64Url.encode(utf8.encode(jsonString));
+    // return base64Url.encode(utf8.encode(jsonString));
+    return gzipJsonString(jsonString);
   }
-
   // 转换为 JSON
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{'id': id};

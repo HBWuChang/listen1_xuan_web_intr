@@ -37,7 +37,7 @@ class ApeiriaController extends GetxController {
         if (arguments.containsKey('track')) {
           final trackData = arguments['track'];
           if (trackData is String) {
-            currentTrack.value = Track.fromBase64(trackData);
+            currentTrack.value = Track.fromBase64MaybeGzip(trackData);
           } else if (trackData is Track) {
             currentTrack.value = trackData;
           }
@@ -57,7 +57,7 @@ class ApeiriaController extends GetxController {
 
         if (queryParameters.containsKey('track')) {
           String trackBase64 = queryParameters['track']!;
-          currentTrack.value = Track.fromBase64(trackBase64);
+          currentTrack.value = Track.fromBase64MaybeGzip(trackBase64);
         } else if (queryParameters.containsKey('trackId')) {
           final trackId = queryParameters['trackId']!;
           debugPrint('Received trackId from URL: $trackId');

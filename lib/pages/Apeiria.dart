@@ -35,21 +35,27 @@ class ApeiriePage extends StatelessWidget {
         () => controller.isLoading.value
             ? const Center(child: CircularProgressIndicator())
             : controller.currentTrack.value == null
-            ? _buildErrorView()
+            ? _buildErrorView(controller)
             : _buildTrackView(controller),
       ),
     );
   }
 
   /// 构建错误视图
-  Widget _buildErrorView() {
-    return const Center(
+  Widget _buildErrorView(ApeiriaController controller) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text('未找到歌曲信息', style: TextStyle(fontSize: 18, color: Colors.grey)),
+          SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: controller.redir,
+            icon: Icon(Icons.open_in_new, size: 16),
+            label: Text('仍尝试跳转'),
+          ),
         ],
       ),
     );
