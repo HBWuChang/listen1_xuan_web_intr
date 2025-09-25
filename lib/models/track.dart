@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
+import 'package:archive/archive.dart';
 
 String gzipJsonString(String jsonStr) {
   // 将字符串转为字节
   List<int> jsonBytes = utf8.encode(jsonStr);
   // gzip 压缩
-  List<int> compressedBytes = gzip.encode(jsonBytes);
+  List<int> compressedBytes = GZipEncoder().encode(jsonBytes);
   // base64Url 编码为字符串（URL 安全）
   return base64Url.encode(compressedBytes);
 }
@@ -14,7 +16,7 @@ String ungzipJsonString(String base64CompressedStr) {
   // base64Url 解码
   List<int> compressedBytes = base64Url.decode(base64CompressedStr);
   // gzip 解压
-  List<int> decompressedBytes = gzip.decode(compressedBytes);
+  List<int> decompressedBytes = GZipDecoder().decodeBytes(compressedBytes);
   // 转为字符串
   return utf8.decode(decompressedBytes);
 }
@@ -69,10 +71,12 @@ class Track {
   }
   factory Track.fromBase64MaybeGzip(String base64Str) {
     String jsonString;
+    debugPrint('Decoding Track from base64 string, length: ${base64Str.length}');
     try {
       // 尝试作为 gzip 压缩数据解压
       jsonString = ungzipJsonString(base64Str);
     } catch (e) {
+      debugPrint('Gzip decompression failed: $e');
       // 如果解压失败，尝试作为普通 base64 解码
       jsonString = utf8.decode(base64Url.decode(base64Str));
     }
